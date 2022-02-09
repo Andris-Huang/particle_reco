@@ -1,7 +1,7 @@
 import itertools
 import importlib
 
-base_file = importlib.import_module(f"src.models.base")
+base_file = importlib.import_module(f"src.models.base_classification")
 Base = base_file.Base
 class Model(Base):
     def __init__(self, data, num_evts, output_dir, save_fig, config=None, debug=False):
