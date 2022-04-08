@@ -4,10 +4,13 @@ class QMLBase:
     """
     The base file for QML tasks.
     """
-    def __init__(self, config, save_fig=True, debug=False):
+    def __init__(self, config, save_fig=True, overwrite=False, debug=False):
         self.base_params = {}
         self.save_fig = save_fig
+        self.overwrite = overwrite
         self.debug = debug
+        self.input_dir = config['input_dir']
+        self.output_dir = config['output_dir']
         
     
     def _process_config(self, config):
@@ -19,8 +22,7 @@ class QMLBase:
 
     def process_data(self):
         
-        input_file = self.config["input_dir"]
-        df = pd.read_csv(input_file)
+        df = pd.read_csv(self.input_dir)
         if "num_evt" not in self.config or self.config["num_evt"] is None:
             self.nevt = self.config["num_evt"] = len(df)
         else:

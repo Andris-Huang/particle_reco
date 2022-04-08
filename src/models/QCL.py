@@ -24,8 +24,8 @@ class Model(Base):
     """
     Model Class for QCL
     """
-    def __init__(self, config, save_fig=True, debug=False):
-        super().__init__(config)
+    def __init__(self, config, save_fig=True, overwrite=False, debug=False):
+        super().__init__(config, save_fig, overwrite, debug)
         self.base_params = {
             "num_evt": None,
             "num_job": 7,
@@ -80,10 +80,11 @@ class Model(Base):
         vqc = self.model()
         self.result = vqc.run(self.quantum_instance)
         counts = vqc.get_optimal_vector()
-        print("Counts (w/o noise) =",counts)
+        print(">>> Counts (w/o noise) =",counts)
         plot = plot_histogram(counts, title='Bit counts (w/o noise)')
         if self.save_fig:
-            plot.savefig('Bit counts (w/o noise)' + '.png')
+            file_name = f"{self.output_dir}/Bit counts (w/o noise).png"
+            plot.savefig(utils.rename_file(file_name))
         plot.show()
         plot.clf()
 
@@ -100,8 +101,8 @@ class Model(Base):
         n_sig_match = np.sum(datapoints[1]+predicted_labels==2)
         n_bg_match = np.sum(datapoints[1]+predicted_labels==0)
 
-        print(" --- Testing success ratio: ", self.result['testing_accuracy'],"(w/o noise)")
-        print(" ---   Signal eff =",n_sig_match/n_sig, ", Background eff =",(n_bg-n_bg_match)/n_bg, " (w/o noise)")
+        print(">>> Testing success ratio: ", self.result['testing_accuracy'],"(w/o noise)")
+        print(">>>   Signal eff =",n_sig_match/n_sig, ", Background eff =",(n_bg-n_bg_match)/n_bg, " (w/o noise)")
 
 
         from sklearn.metrics import roc_curve, auc, roc_auc_score
@@ -122,7 +123,10 @@ class Model(Base):
         roc_auc_tr = auc(fpr_tr, tpr_tr)
         plt.plot(fpr_tr, tpr_tr, color='darkblue', lw=2, label='Training w/o noise (area = %0.3f)' % roc_auc_tr)
         plt.legend(loc="lower right")
-        plt.savefig('ROC.png')
+        if self.save_fig:
+            file_name = f"{self.output_dir}/ROC.png"
+            plt.savefig(utils.rename_file(file_name))
         plt.clf()
-        print(f'AUC(training) w/o noise = {roc_auc_tr:.3f}')
-        print(f'AUC(testing) w/o noise = {roc_auc:.3f}')
+        plt.show()
+        print(f'>>> AUC(training) w/o noise = {roc_auc_tr:.3f}')
+        print(f'>>> AUC(testing) w/o noise = {roc_auc:.3f}')
