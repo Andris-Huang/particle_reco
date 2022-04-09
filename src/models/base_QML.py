@@ -1,11 +1,12 @@
 import pandas as pd
 
-class QMLBase:
+class Base:
     """
     The base file for QML tasks.
     """
     def __init__(self, config, save_fig=True, overwrite=False, debug=False):
         self.base_params = {}
+        self.config = config
         self.save_fig = save_fig
         self.overwrite = overwrite
         self.debug = debug
@@ -22,15 +23,15 @@ class QMLBase:
 
     def process_data(self):
         
-        df = pd.read_csv(self.input_dir)
+        df = pd.read_csv(self.input_dir, names=('isSignal','lep1_pt','lep1_eta','lep1_phi','lep2_pt','lep2_eta','lep2_phi','miss_ene','miss_phi','MET_rel','axial_MET','M_R','M_TR_2','R','MT2','S_R','M_Delta_R','dPhi_r_b','cos_theta_r1'))
         if "num_evt" not in self.config or self.config["num_evt"] is None:
             self.nevt = self.config["num_evt"] = len(df)
         else:
             self.nevt = self.config["num_evt"]
         if "training_size" not in self.config:
-            self.config["training_size"] = 0.7 * self.nevt
+            self.config["training_size"] = int(0.7 * self.nevt)
         if "testing_size" not in self.config:
-            self.config["testing_size"] = 0.3 * self.nevt
+            self.config["testing_size"] = int(0.3 * self.nevt)
 
         SelectedFeatures = self.config["features"]
         training_size = self.config["training_size"]

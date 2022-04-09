@@ -13,6 +13,7 @@ from qiskit.aqua.utils import split_dataset_to_data_and_labels, map_label_to_cla
 #from qiskit.aqua.input import ClassificationInput
 import numpy as np
 import matplotlib.pyplot as plt
+#import os
 
 from qiskit.tools.visualization import plot_histogram
 
@@ -41,9 +42,10 @@ class Model(Base):
         }
         self.config = self._process_config(config)
         self.training_input, self.test_input = self.process_data()
+        self.model = self.construct_model()
         
 
-    def model(self):
+    def construct_model(self):
         """
         Construct a VQC circuit model
         """
@@ -53,7 +55,7 @@ class Model(Base):
         niter = self.config['num_iter']
         feature_dim = len(self.config['features'])
         shots = self.config['shots']
-        uin_depth = self.config['encorder_depth']
+        uin_depth = self.config['encoder_depth']
         uvar_depth = self.config['vqc_depth']
         Optimizer = self.config['optimizer']
         featureMap = self.config['feature_map']
@@ -73,28 +75,30 @@ class Model(Base):
         
         return vqc
 
+    
     def train(self):
         """
         Train the QML model by running VQC
         """
-        vqc = self.model()
+        vqc = self.model
         self.result = vqc.run(self.quantum_instance)
         counts = vqc.get_optimal_vector()
         print(">>> Counts (w/o noise) =",counts)
         plot = plot_histogram(counts, title='Bit counts (w/o noise)')
         if self.save_fig:
-            file_name = f"{self.output_dir}/Bit counts (w/o noise).png"
-            plot.savefig(utils.rename_file(file_name))
-        plot.show()
+            file_name = f"{self.output_dir}/Bit_counts.png"
+            file_path = utils.rename_file(file_name, overwrite=self.overwrite)
+            #os.mkdir(file_path)
+            plot.savefig(file_path)
         plot.clf()
 
-    def predict(self):
-        return self.model().predict
+    def predict(self, input_data):
+        return self.model.predict(input_data)
 
     def evaluate(self):
         datapoints, class_to_label = split_dataset_to_data_and_labels(self.test_input)
         predicted_probs, predicted_labels = self.predict(datapoints[0])
-        predicted_classes = map_label_to_class_name(predicted_labels, self.model().label_to_class)
+        predicted_classes = map_label_to_class_name(predicted_labels, self.model.label_to_class)
 
         n_sig = np.sum(datapoints[1]==1)
         n_bg = np.sum(datapoints[1]==0)
@@ -102,7 +106,7 @@ class Model(Base):
         n_bg_match = np.sum(datapoints[1]+predicted_labels==0)
 
         print(">>> Testing success ratio: ", self.result['testing_accuracy'],"(w/o noise)")
-        print(">>>   Signal eff =",n_sig_match/n_sig, ", Background eff =",(n_bg-n_bg_match)/n_bg, " (w/o noise)")
+        print(">>> Signal eff =",n_sig_match/n_sig, ", Background eff =",(n_bg-n_bg_match)/n_bg, " (w/o noise)")
 
 
         from sklearn.metrics import roc_curve, auc, roc_auc_score
@@ -125,8 +129,8 @@ class Model(Base):
         plt.legend(loc="lower right")
         if self.save_fig:
             file_name = f"{self.output_dir}/ROC.png"
-            plt.savefig(utils.rename_file(file_name))
+            plt.savefig(utils.rename_file(file_name, overwrite=self.overwrite))
         plt.clf()
-        plt.show()
+        #Splt.show()
         print(f'>>> AUC(training) w/o noise = {roc_auc_tr:.3f}')
         print(f'>>> AUC(testing) w/o noise = {roc_auc:.3f}')
