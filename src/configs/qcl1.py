@@ -12,7 +12,7 @@ elif feature_dim == 7:
 
 config = {
     "model": "QCL",
-    "input_dir": "datasets/SUSY.csv",
+    "input_dir": "../datasets/SUSY.csv",
     "output_dir": "outputs/SUSY",
     "num_evt": 100,
     "num_job": 10,

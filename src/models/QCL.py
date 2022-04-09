@@ -1,7 +1,7 @@
 import importlib
 from qiskit import QuantumCircuit, assemble, transpile, Aer, IBMQ
 from qiskit.visualization import *
-from ibm_quantum_widgets import *
+#from ibm_quantum_widgets import *
 from qiskit.providers.aer import QasmSimulator
 from qiskit.utils import QuantumInstance
 from qiskit.aqua.algorithms import VQC

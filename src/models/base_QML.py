@@ -23,7 +23,7 @@ class Base:
 
     def process_data(self):
         
-        df = pd.read_csv(self.input_dir, names=('isSignal','lep1_pt','lep1_eta','lep1_phi','lep2_pt','lep2_eta','lep2_phi','miss_ene','miss_phi','MET_rel','axial_MET','M_R','M_TR_2','R','MT2','S_R','M_Delta_R','dPhi_r_b','cos_theta_r1'))
+        df = pd.read_csv(self.input_dir)
         if "num_evt" not in self.config or self.config["num_evt"] is None:
             self.nevt = self.config["num_evt"] = len(df)
         else:
