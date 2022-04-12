@@ -4,12 +4,13 @@ class Base:
     """
     The base file for QML tasks.
     """
-    def __init__(self, config, save_fig=True, overwrite=False, debug=False):
+    def __init__(self, config, save_fig=True, overwrite=False, debug=False, hide_display=False):
         self.base_params = {}
         self.config = config
         self.save_fig = save_fig
         self.overwrite = overwrite
         self.debug = debug
+        self.hide_display = hide_display
         self.input_dir = config['input_dir']
         self.output_dir = config['output_dir']
         

@@ -25,8 +25,8 @@ class Model(Base):
     """
     Model Class for QCL
     """
-    def __init__(self, config, save_fig=True, overwrite=False, debug=False):
-        super().__init__(config, save_fig, overwrite, debug)
+    def __init__(self, config, save_fig=True, overwrite=False, debug=False, hide_display=False):
+        super().__init__(config, save_fig, overwrite, debug, hide_display)
         self.base_params = {
             "num_evt": None,
             "num_job": 7,
@@ -83,7 +83,8 @@ class Model(Base):
         vqc = self.model
         self.result = vqc.run(self.quantum_instance)
         counts = vqc.get_optimal_vector()
-        print(">>> Counts (w/o noise) =",counts)
+        if not self.hide_display:
+            print(">>> Counts (w/o noise) =",counts)
         plot = plot_histogram(counts, title='Bit counts (w/o noise)')
         if self.save_fig:
             file_name = f"{self.output_dir}/Bit_counts.png"
@@ -104,9 +105,10 @@ class Model(Base):
         n_bg = np.sum(datapoints[1]==0)
         n_sig_match = np.sum(datapoints[1]+predicted_labels==2)
         n_bg_match = np.sum(datapoints[1]+predicted_labels==0)
-
-        print(">>> Testing success ratio: ", self.result['testing_accuracy'],"(w/o noise)")
-        print(">>> Signal eff =",n_sig_match/n_sig, ", Background eff =",(n_bg-n_bg_match)/n_bg, " (w/o noise)")
+        
+        if not self.hide_display:
+            print(">>> Testing success ratio: ", self.result['testing_accuracy'],"(w/o noise)")
+            print(">>> Signal eff =",n_sig_match/n_sig, ", Background eff =",(n_bg-n_bg_match)/n_bg, " (w/o noise)")
 
 
         from sklearn.metrics import roc_curve, auc, roc_auc_score
@@ -131,6 +133,8 @@ class Model(Base):
             file_name = f"{self.output_dir}/ROC.png"
             plt.savefig(utils.rename_file(file_name, overwrite=self.overwrite))
         plt.clf()
-        #Splt.show()
-        print(f'>>> AUC(training) w/o noise = {roc_auc_tr:.3f}')
-        print(f'>>> AUC(testing) w/o noise = {roc_auc:.3f}')
+        if not self.hide_display:
+            print(f'>>> AUC(training) w/o noise = {roc_auc_tr:.3f}')
+            print(f'>>> AUC(testing) w/o noise = {roc_auc:.3f}')
+        
+        return roc_auc_tr, roc_auc
