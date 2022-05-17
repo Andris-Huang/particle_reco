@@ -207,3 +207,13 @@ def abe(a, b):
     """
     a, b = np.array(a), np.array(b)
     return np.mean(np.abs(a - b))
+
+
+def rename_file(file_path, overwrite=False):
+    file_name = file_path[:-4]
+    file_type = file_path[-4:]
+    count = 0
+    while os.path.exists(file_path) and not overwrite:
+        file_path = f"{file_name}_copy{count}{file_type}"
+        count += 1
+    return file_path
